@@ -26,7 +26,7 @@ namespace OpenCLforNet
             }
         }
 
-        public void NDRange(CommandQueue commandQueue, int[] workSizes, params object[] args)
+        public void SetArgs(params object[] args)
         {
             for (var i = 0; i < args.Length; i++)
             {
@@ -81,10 +81,20 @@ namespace OpenCLforNet
                     throw new NotImplementedException();
                 }
             }
+        }
+
+        public void NDRange(CommandQueue commandQueue, int[] workSizes)
+        {
             fixed (int* workSizeArrayPointer = workSizes)
             {
                 OpenCL.CheckError(OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, workSizes.Rank, null, workSizeArrayPointer, null, 0, null, null));
             }
+        }
+
+        public void NDRange(CommandQueue commandQueue, int[] workSizes, params object[] args)
+        {
+            SetArgs(args);
+            NDRange(commandQueue, workSizes);
         }
 
         public void Release()
