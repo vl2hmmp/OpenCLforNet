@@ -43,8 +43,15 @@ namespace OpenCLforNet
             }
             catch (Exception e)
             {
+                long logSize;
+                OpenCL.clGetProgramBuildInfo(Pointer, context.Devices[0].Pointer, (long)cl_program_build_info.CL_PROGRAM_BUILD_LOG, 0, null, &logSize);
+                byte[] log = new byte[logSize + 1];
+                fixed (byte* logPointer = log)
+                {
+                    OpenCL.clGetProgramBuildInfo(Pointer, context.Devices[0].Pointer, (long)cl_program_build_info.CL_PROGRAM_BUILD_LOG, logSize, logPointer, null);
+                }
                 OpenCL.clReleaseProgram(Pointer);
-                throw e;
+                throw new Exception(e.Message + Environment.NewLine + Encoding.UTF8.GetString(log, 0, (int)logSize));
             }
         }
 

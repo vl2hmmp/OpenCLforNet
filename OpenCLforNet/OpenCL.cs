@@ -41,6 +41,9 @@ namespace OpenCLforNet
         public static extern int clBuildProgram(long program, int num_devices, long* device_list, byte* options, void* notify, void* user_data);
 
         [DllImport("OpenCL.dll")]
+        public static extern int clGetProgramBuildInfo(long program, long device, long param_name, long param_value_size, void* param_value, long* param_value_size_ret);
+
+        [DllImport("OpenCL.dll")]
         public static extern int clReleaseProgram(long program);
 
         [DllImport("OpenCL.dll")]
@@ -241,6 +244,15 @@ namespace OpenCLforNet
         CL_DEVICE_SVM_FINE_GRAIN_BUFFER = (1 << 1),
         CL_DEVICE_SVM_FINE_GRAIN_SYSTEM = (1 << 2),
         CL_DEVICE_SVM_ATOMICS = (1 << 3)
+    }
+
+    public enum cl_program_build_info : long
+    {
+        CL_PROGRAM_BUILD_STATUS = 0x1181,
+        CL_PROGRAM_BUILD_OPTIONS = 0x1182,
+        CL_PROGRAM_BUILD_LOG = 0x1183,
+        CL_PROGRAM_BINARY_TYPE = 0x1184,
+        CL_PROGRAM_BUILD_GLOBAL_VARIABLE_TOTAL_SIZE = 0x1185
     }
 
     public enum cl_status_code
