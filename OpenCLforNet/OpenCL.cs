@@ -89,7 +89,7 @@ namespace OpenCLforNet
         public static extern int clSetKernelArgSVMPointer(long kernel, int arg_index, void* arg_value);
 
         [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueNDRangeKernel(long command_queue, long kernel, int work_dim, int* global_work_offset, int* gloal_work_size, int* local_work_size, int num_events_in_wait_list, int* event_wait_list, int* event_);
+        public static extern int clEnqueueNDRangeKernel(long command_queue, long kernel, int work_dim, long* global_work_offset, long* gloal_work_size, long* local_work_size, int num_events_in_wait_list, int* event_wait_list, int* event_);
 
         [DllImport("OpenCL.dll")]
         public static extern int clFinish(long command_queue);

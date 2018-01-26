@@ -83,18 +83,32 @@ namespace OpenCLforNet
             }
         }
 
-        public void NDRange(CommandQueue commandQueue, int[] workSizes)
+        private long[] WorkSizes = new long[] { 0, 0, 0 };
+
+        public void SetWorkSize(long[] workSizes)
         {
-            fixed (int* workSizeArrayPointer = workSizes)
+            WorkSizes = (long[])workSizes.Clone();
+        }
+
+        public void NDRange(CommandQueue commandQueue)
+        {
+            fixed (long* workSizeArrayPointer = WorkSizes)
             {
-                OpenCL.CheckError(OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, workSizes.Rank, null, workSizeArrayPointer, null, 0, null, null));
+                OpenCL.CheckError(OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, WorkSizes.Rank, null, workSizeArrayPointer, null, 0, null, null));
             }
         }
 
-        public void NDRange(CommandQueue commandQueue, int[] workSizes, params object[] args)
+        public void NDRange(CommandQueue commandQueue, long[] workSizes)
         {
+            SetWorkSize(workSizes);
+            NDRange(commandQueue);
+        }
+
+        public void NDRange(CommandQueue commandQueue, long[] workSizes, params object[] args)
+        {
+            SetWorkSize(workSizes);
             SetArgs(args);
-            NDRange(commandQueue, workSizes);
+            NDRange(commandQueue);
         }
 
         public void Release()

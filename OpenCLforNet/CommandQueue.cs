@@ -22,7 +22,7 @@ namespace OpenCLforNet
             OpenCL.CheckError(status);
         }
 
-        public void NDRangeKernel(Kernel kernel, int[] workSizes, params object[] args)
+        public void NDRangeKernel(Kernel kernel, long[] workSizes, params object[] args)
         {
             kernel.NDRange(this, workSizes, args);
         }

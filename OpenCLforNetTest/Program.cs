@@ -46,7 +46,7 @@ namespace OpenCLforNetTest
             var dataSize = sizeof(float) * 4;
             var simpleMemory = context.CreateSimpleMemory(dataSize);
             simpleMemory.Write(commandQueue, true, data, 0, dataSize);
-            kernel.NDRange(commandQueue, new int[] { 4 }, simpleMemory, 3F);
+            kernel.NDRange(commandQueue, new long[] { 4 }, simpleMemory, 3F);
             commandQueue.WaitFinish();
             simpleMemory.Read(commandQueue, true, data, 0, dataSize);
             ShowArray(data);
@@ -57,7 +57,7 @@ namespace OpenCLforNetTest
             data = new float[] { 3F, 4.5F, 0F, -4.4F };
             dataSize = sizeof(float) * 4;
             simpleMemory = context.CreateSimpleMemory(data, dataSize);
-            kernel.NDRange(commandQueue, new int[] { 4 }, simpleMemory, 3F);
+            kernel.NDRange(commandQueue, new long[] { 4 }, simpleMemory, 3F);
             commandQueue.WaitFinish();
             simpleMemory.Read(commandQueue, true, data, 0, dataSize);
             ShowArray(data);
@@ -73,7 +73,7 @@ namespace OpenCLforNetTest
             pointer[2] = 0F;
             pointer[3] = -4.4F;
             mappingMemory.UnMapping(commandQueue, pointer);
-            kernel.NDRange(commandQueue, new int[] { 4 }, mappingMemory, 3F);
+            kernel.NDRange(commandQueue, new long[] { 4 }, mappingMemory, 3F);
             commandQueue.WaitFinish();
             mappingMemory.Read(commandQueue, true, data, 0, dataSize);
             ShowArray(data);
@@ -84,7 +84,7 @@ namespace OpenCLforNetTest
             data = new float[] { 3F, 4.5F, 0F, -4.4F };
             dataSize = sizeof(float) * 4;
             mappingMemory = context.CreateMappingMemory(data, dataSize);
-            kernel.NDRange(commandQueue, new int[] { 4 }, mappingMemory, 3F);
+            kernel.NDRange(commandQueue, new long[] { 4 }, mappingMemory, 3F);
             commandQueue.WaitFinish();
             mappingMemory.Read(commandQueue, true, data, 0, dataSize);
             ShowArray(data);
@@ -99,7 +99,7 @@ namespace OpenCLforNetTest
             pointer[1] = 4.5F;
             pointer[2] = 0F;
             pointer[3] = -4.4F;
-            kernel.NDRange(commandQueue, new int[] { 4 }, svmBuffer, 3F);
+            kernel.NDRange(commandQueue, new long[] { 4 }, svmBuffer, 3F);
             commandQueue.WaitFinish();
             Console.Write("{  ");
             for (var i = 0; i < 4; i++)
