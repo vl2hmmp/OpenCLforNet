@@ -30,51 +30,42 @@ namespace OpenCLforNet
         {
             for (var i = 0; i < args.Length; i++)
             {
-                var type = args[i].GetType();
-                if (type.Equals(typeof(SimpleMemory)) || type.Equals(typeof(MappingMemory)))
+                if (args[i] is Memory mem)
                 {
-                    var argPointer = ((Memory)args[i]).Pointer;
+                    var argPointer = mem.Pointer;
                     OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(long), &argPointer));
                 }
-                else if (type.Equals(typeof(SVMBuffer)))
+                else if (args[i] is SVMBuffer buf)
                 {
-                    var argPointer = ((SVMBuffer)args[i]).Pointer;
-                    OpenCL.CheckError(OpenCL.clSetKernelArgSVMPointer(Pointer, i, argPointer));
+                    OpenCL.CheckError(OpenCL.clSetKernelArgSVMPointer(Pointer, i, buf.Pointer));
                 }
-                else if (type.Equals(typeof(byte)))
+                else if (args[i] is byte barg)
                 {
-                    var value = (byte)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(byte), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(byte), &barg));
                 }
-                else if (type.Equals(typeof(char)))
+                else if (args[i] is char carg)
                 {
-                    var value = (char)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(char), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(char), &carg));
                 }
-                else if (type.Equals(typeof(short)))
+                else if (args[i] is short sarg)
                 {
-                    var value = (short)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(short), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(short), &sarg));
                 }
-                else if (type.Equals(typeof(int)))
+                else if (args[i] is int iarg)
                 {
-                    var value = (int)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(int), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(int), &iarg));
                 }
-                else if (type.Equals(typeof(long)))
+                else if (args[i] is long larg)
                 {
-                    var value = (long)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(long), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(long), &larg));
                 }
-                else if (type.Equals(typeof(float)))
+                else if (args[i] is float farg)
                 {
-                    var value = (float)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(float), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(float), &farg));
                 }
-                else if (type.Equals(typeof(double)))
+                else if (args[i] is double darg)
                 {
-                    var value = (double)args[i];
-                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(double), &value));
+                    OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(double), &darg));
                 }
                 else
                 {

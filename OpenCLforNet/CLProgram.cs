@@ -32,9 +32,7 @@ namespace OpenCLforNet
 
             try
             {
-                var deviceArray = new List<long>();
-                foreach (var device in context.Devices)
-                    deviceArray.Add(device.Pointer);
+                var deviceArray = context.Devices.Select(device => device.Pointer).ToList();
                 fixed (long* deviceArrayPointer = deviceArray.ToArray())
                 {
                     OpenCL.CheckError(OpenCL.clBuildProgram(Pointer, deviceArray.Count, deviceArrayPointer, null, null, null));

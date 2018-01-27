@@ -15,9 +15,7 @@ namespace OpenCLforNet
         public Context(params Device[] devices)
         {
             int status = (int)cl_status_code.CL_SUCCESS;
-            var deviceArray = new List<long>();
-            foreach (var device in devices)
-                deviceArray.Add(device.Pointer);
+            var deviceArray = devices.Select(device => device.Pointer).ToList();
             fixed (long* deviceArrayPointer = deviceArray.ToArray())
             {
                 Devices = devices;
