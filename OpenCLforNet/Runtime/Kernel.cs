@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using OpenCLforNet.Memory;
+using OpenCLforNet.RuntimeFunction;
 
-namespace OpenCLforNet
+namespace OpenCLforNet.Runtime
 {
     public unsafe class Kernel
     {
 
-        public readonly string KernelName;
-        public readonly CLProgram Program;
-        public readonly long Pointer;
+        public string KernelName { get; }
+        public CLProgram Program { get; }
+        public void *Pointer { get; }
 
         public Kernel(CLProgram program, string kernelName)
         {
+            KernelName = kernelName;
+            Program = program;
+
             int status = (int)cl_status_code.CL_SUCCESS;
             var kernelNameArray = Encoding.UTF8.GetBytes(kernelName);
             fixed (byte* kernelNameArrayPointer = kernelNameArray)
             {
                 Pointer = OpenCL.clCreateKernel(program.Pointer, kernelNameArrayPointer, &status);
-                KernelName = kernelName;
-                Program = program;
                 OpenCL.CheckError(status);
             }
         }
@@ -30,7 +34,7 @@ namespace OpenCLforNet
         {
             for (var i = 0; i < args.Length; i++)
             {
-                if (args[i] is Memory mem)
+                if (args[i] is AbstractMemory mem)
                 {
                     var argPointer = mem.Pointer;
                     OpenCL.CheckError(OpenCL.clSetKernelArg(Pointer, i, sizeof(long), &argPointer));
@@ -74,19 +78,19 @@ namespace OpenCLforNet
             }
         }
 
-        private long[] WorkSizes = new long[] { 0, 0, 0 };
+        private void **WorkSizes = (void**)Marshal.AllocCoTaskMem(3 * IntPtr.Size);
 
         public void SetWorkSize(long[] workSizes)
         {
-            WorkSizes = (long[])workSizes.Clone();
+            if (3 != workSizes.Length)
+                throw new ArgumentException("workSizes length must be 3");
+            for (var i = 0; i < 3; i++)
+                WorkSizes[i] = (void *)(new IntPtr(workSizes[i]));
         }
 
         public void NDRange(CommandQueue commandQueue)
         {
-            fixed (long* workSizeArrayPointer = WorkSizes)
-            {
-                OpenCL.CheckError(OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, WorkSizes.Rank, null, workSizeArrayPointer, null, 0, null, null));
-            }
+            OpenCL.CheckError(OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, 3, null, WorkSizes, null, 0, null, null));
         }
 
         public void NDRange(CommandQueue commandQueue, long[] workSizes)

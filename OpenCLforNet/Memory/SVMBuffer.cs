@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenCLforNet.PlatformLayer;
+using OpenCLforNet.Runtime;
+using OpenCLforNet.RuntimeFunction;
 
-namespace OpenCLforNet
+namespace OpenCLforNet.Memory
 {
     public unsafe class SVMBuffer : Buffer
     {
 
-        public readonly int Size;
-        public readonly Context Context;
-        public readonly void* Pointer;
+        public long Size { get; }
+        public Context Context { get; }
+        public void *Pointer { get; }
 
-        public SVMBuffer(Context context, int size, int alignment)
+        public SVMBuffer(Context context, long size, uint alignment)
         {
-            Pointer = OpenCL.clSVMAlloc(context.Pointer, (long)cl_mem_flags.CL_MEM_READ_WRITE, size, alignment);
             Size = size;
             Context = context;
+            Pointer = OpenCL.clSVMAlloc(context.Pointer, cl_mem_flags.CL_MEM_READ_WRITE, new IntPtr(size), alignment);
         }
 
         public void* GetSVMPointer()
@@ -27,7 +30,7 @@ namespace OpenCLforNet
 
         public void Mapping(CommandQueue commandQueue, bool blocking)
         {
-            OpenCL.CheckError(OpenCL.clEnqueueSVMMap(commandQueue.Pointer, blocking, (long)(cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), Pointer, Size, 0, null, null));
+            OpenCL.CheckError(OpenCL.clEnqueueSVMMap(commandQueue.Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), Pointer, new IntPtr(Size), 0, null, null));
         }
 
         public void UnMapping(CommandQueue commandQueue)

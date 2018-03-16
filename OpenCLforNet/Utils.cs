@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace OpenCLforNet
 {
-    public abstract class Buffer
+    class Utils
     {
+
+        public static bool Is32Bit()
+        {
+            return IntPtr.Size == 4;
+        }
 
     }
 }

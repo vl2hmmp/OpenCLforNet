@@ -3,107 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
-namespace OpenCLforNet
+namespace OpenCLforNet.RuntimeFunction
 {
-    unsafe class OpenCL
-    {
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clGetPlatformIDs(int num_entries, long* platforms, int* num_platforms);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clGetPlatformInfo(long platform, int param_name, int param_value_size, void* param_value, int* param_value_size_ret);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clGetDeviceIDs(long platform, long device_type, int num_entries, long* devices, int* num_devices);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clGetDeviceInfo(long device, int param_name, int param_value_size, void* param_value, int* param_value_size_ret);
-
-        [DllImport("OpenCL.dll")]
-        public static extern long clCreateContext(long* properties, int num_devices, long* devices, int* notify, int* user_data, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clReleaseContext(long context);
-
-        [DllImport("OpenCL.dll")]
-        public static extern long clCreateCommandQueue(long context, long device, int* properties, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clReleaseCommandQueue(long command_queue);
-
-        [DllImport("OpenCL.dll")]
-        public static extern long clCreateProgramWithSource(long context, int count, byte** strings, int* lengths, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clBuildProgram(long program, int num_devices, long* device_list, byte* options, void* notify, void* user_data);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clGetProgramBuildInfo(long program, long device, long param_name, long param_value_size, void* param_value, long* param_value_size_ret);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clReleaseProgram(long program);
-
-        [DllImport("OpenCL.dll")]
-        public static extern long clCreateKernel(long program, byte* kernel_name, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clReleaseKernel(long kernel);
-
-        [DllImport("OpenCL.dll")]
-        public static extern long clCreateBuffer(long context, long flags, int size, void* host_ptr, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueReadBuffer(long command_queue, long buffer, bool blocking_read, int offset, int cb, void* ptr, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueWriteBuffer(long command_queue, long buffer, bool blocking_write, int offset, int cb, void* ptr, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern void* clEnqueueMapBuffer(long command_queue, long buffer, bool blocking_map, long map_flags, int offset, int size, int num_events_in_wait_list, int* event_wait_list, int* event_, int* error_code);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueUnmapMemObject(long command_queue, long memobj, void* mapped_ptr, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clReleaseMemObject(long mem);
-
-        [DllImport("OpenCL.dll")]
-        public static extern void* clSVMAlloc(long context, long flags, int size, int alignment);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueSVMMap(long command_queue, bool blocking_map, long map_flags, void* svm_ptr, int size, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueSVMUnmap(long command_queue, void* svm_ptr, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern void clSVMFree(long context, void* svm_pointer);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clSetKernelArg(long kernel, int arg_index, int arg_size, void* arg_value);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clSetKernelArgSVMPointer(long kernel, int arg_index, void* arg_value);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clEnqueueNDRangeKernel(long command_queue, long kernel, int work_dim, long* global_work_offset, long* gloal_work_size, long* local_work_size, int num_events_in_wait_list, int* event_wait_list, int* event_);
-
-        [DllImport("OpenCL.dll")]
-        public static extern int clFinish(long command_queue);
-
-        public static void CheckError(int status)
-        {
-            var code = (cl_status_code)Enum.ToObject(typeof(cl_status_code), status);
-            if (code != cl_status_code.CL_SUCCESS)
-            {
-                throw new Exception(Enum.GetName(typeof(cl_status_code), code));
-            }
-        }
-
-    }
 
     public enum cl_device_type : long
     {
@@ -114,17 +16,16 @@ namespace OpenCLforNet
         CL_DEVICE_TYPE_ALL = 0xFFFFFFFF
     }
 
-    public enum cl_platform_info
+    public enum cl_platform_info : long
     {
         CL_PLATFORM_PROFILE = 0x0900,
         CL_PLATFORM_VERSION = 0x0901,
         CL_PLATFORM_NAME = 0x0902,
         CL_PLATFORM_VENDOR = 0x0903,
-        CL_PLATFORM_EXTENSIONS = 0x0904,
-        CL_PLATFORM_HOST_TIMER_RESOLUTION = 0x0905
+        CL_PLATFORM_EXTENSIONS = 0x0904
     }
 
-    public enum cl_device_info
+    public enum cl_device_info : long
     {
         CL_DEVICE_TYPE = 0x1000,
         CL_DEVICE_VENDOR_ID = 0x1001,
@@ -169,7 +70,6 @@ namespace OpenCLforNet
         CL_DEVICE_COMPILER_AVAILABLE = 0x1028,
         CL_DEVICE_EXECUTION_CAPABILITIES = 0x1029,
         CL_DEVICE_QUEUE_PROPERTIES = 0x102A,
-        CL_DEVICE_QUEUE_ON_HOST_PROPERTIES = 0x102A,
         CL_DEVICE_NAME = 0x102B,
         CL_DEVICE_VENDOR = 0x102C,
         CL_DRIVER_VERSION = 0x102D,
@@ -219,6 +119,45 @@ namespace OpenCLforNet
         CL_DEVICE_IL_VERSION = 0x105B,
         CL_DEVICE_MAX_NUM_SUB_GROUPS = 0x105C,
         CL_DEVICE_SUB_GROUP_INDEPENDENT_FORWARD_PROGRESS = 0x105D
+    }
+
+    public enum cl_device_fp_config : long
+    {
+        CL_FP_DENORM = (1 << 0),
+        CL_FP_INF_NAN = (1 << 1),
+        CL_FP_ROUND_TO_NEAREST = (1 << 2),
+        CL_FP_ROUND_TO_ZERO = (1 << 3),
+        CL_FP_ROUND_TO_INF = (1 << 4),
+        CL_FP_FMA = (1 << 5),
+        CL_FP_SOFT_FLOAT = (1 << 6),
+        CL_FP_CORRECTLY_ROUNDED_DIVIDE_SQRT = (1 << 7)
+    }
+
+    public enum cl_device_mem_cache_type : long
+    {
+        CL_NONE = 0x0,
+        CL_READ_ONLY_CACHE = 0x1,
+        CL_READ_WRITE_CACHE = 0x2
+    }
+
+    public enum cl_device_local_mem_type : long
+    {
+        CL_LOCAL = 0x1,
+        CL_GLOBAL = 0x2
+    }
+
+    public enum cl_device_exec_capabilities : long
+    {
+        CL_EXEC_KERNEL = (1 << 0),
+        CL_EXEC_NATIVE_KERNEL = (1 << 1)
+    }
+
+    public enum cl_command_queue_properties : long
+    {
+        CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE = (1 << 0),
+        CL_QUEUE_PROFILING_ENABLE = (1 << 1),
+        CL_QUEUE_ON_DEVICE = (1 << 2),
+        CL_QUEUE_ON_DEVICE_DEFAULT = (1 << 3)
     }
 
     public enum cl_mem_flags : long

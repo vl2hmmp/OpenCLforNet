@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenCLforNet.PlatformLayer;
+using OpenCLforNet.RuntimeFunction;
 
-namespace OpenCLforNet
+namespace OpenCLforNet.Runtime
 {
     public unsafe class CommandQueue
     {
 
-        public readonly Context Context;
-        public readonly Device Device;
-        public readonly long Pointer;
+        public Context Context { get; }
+        public Device Device { get; }
+        public void *Pointer { get; }
 
         public CommandQueue(Context context, Device device)
         {
             int status = (int)cl_status_code.CL_SUCCESS;
             Context = context;
             Device = device;
-            Pointer = OpenCL.clCreateCommandQueue(context.Pointer, device.Pointer, null, &status);
+            Pointer = OpenCL.clCreateCommandQueue(context.Pointer, device.Pointer, cl_command_queue_properties.CL_QUEUE_ON_DEVICE, &status);
             OpenCL.CheckError(status);
         }
 
