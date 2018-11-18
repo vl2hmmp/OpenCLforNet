@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.PlatformLayer
 {
@@ -17,7 +17,7 @@ namespace OpenCLforNet.PlatformLayer
         {
             // get platforms
             uint count = 0;
-            OpenCL.CheckError(OpenCL.clGetPlatformIDs(0, null, &count));
+            OpenCL.clGetPlatformIDs(0, null, &count).CheckError();
 
             // create platform infos
             for (int i = 0; i < count; i++)
@@ -25,7 +25,7 @@ namespace OpenCLforNet.PlatformLayer
         }
 
         public int Index { get; }
-        public void *Pointer { get; }
+        public void* Pointer { get; }
         public PlatformInfo Info { get; }
 
         public Platform(int index)
@@ -34,19 +34,25 @@ namespace OpenCLforNet.PlatformLayer
 
             // get a platform
             uint count = 0;
-            OpenCL.CheckError(OpenCL.clGetPlatformIDs(0, null, &count));
-            void **platforms = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
-            OpenCL.CheckError(OpenCL.clGetPlatformIDs(count, platforms, &count));
-            Pointer = platforms[index];
+            OpenCL.clGetPlatformIDs(0, null, &count).CheckError();
+            void** platforms = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
+
+            try
+            {
+                OpenCL.clGetPlatformIDs(count, platforms, &count).CheckError();
+                Pointer = platforms[index];
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(new IntPtr(platforms));
+            }
 
             Info = PlatformInfos[index];
-
-            Marshal.FreeCoTaskMem(new IntPtr(platforms));
         }
 
-        public Device[] CreateDevices(params int[] index)
+        public Device[] CreateDevices(params int[] indices)
         {
-            return index
+            return indices
                 .Select(i => new Device(this, i))
                 .ToArray();
         }

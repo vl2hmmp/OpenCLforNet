@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{82BAA5E0-CE95-45B1-8127-55BF37C34033}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenCLforNet</RootNamespace>
-    <AssemblyName>OpenCLforNet</AssemblyName>
+    <ProjectGuid>{249EFCDC-67F8-4C10-8FE4-D09BCA6BDD12}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OpenCLforNetTest</RootNamespace>
+    <AssemblyName>OpenCLforNetTest</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -20,18 +21,17 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,29 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buffer.cs" />
-    <Compile Include="CLProgram.cs" />
-    <Compile Include="CommandQueue.cs" />
-    <Compile Include="Context.cs" />
-    <Compile Include="Framework\Device.cs" />
-    <Compile Include="Framework\DeviceInfo.cs" />
-    <Compile Include="Kernel.cs" />
-    <Compile Include="MappingMemory.cs" />
-    <Compile Include="Memory.cs" />
-    <Compile Include="Runtime\Enums.cs" />
-    <Compile Include="Runtime\FrameworkFunctions.cs" />
-    <Compile Include="Runtime\OpenCL.cs" />
-    <Compile Include="Framework\Platform.cs" />
-    <Compile Include="Framework\PlatformInfo.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleMemory.cs" />
-    <Compile Include="SVMBuffer.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="OpenCL.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenCLforNet\OpenCLforNet.csproj">
+      <Project>{a114684b-8338-43b8-a042-a4fbb9250f92}</Project>
+      <Name>OpenCLforNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

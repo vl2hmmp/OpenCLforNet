@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using OpenCLforNet.Memory;
 using OpenCLforNet.Runtime;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.PlatformLayer
 {
@@ -21,26 +21,18 @@ namespace OpenCLforNet.PlatformLayer
             Devices = devices;
 
             int status = (int)cl_status_code.CL_SUCCESS;
-            var devicePointers = (void**)Marshal.AllocCoTaskMem((devices.Length * IntPtr.Size));
+            var devicePointers = (void**)Marshal.AllocCoTaskMem(devices.Length * IntPtr.Size);
             for (var i = 0; i < devices.Length; i++)
                 devicePointers[i] = devices[i].Pointer;
 
 
             Pointer = OpenCL.clCreateContext(null, (uint)devices.Length, devicePointers, null, null, &status);
-            OpenCL.CheckError(status);
+            status.CheckError();
         }
 
         public CommandQueue CreateCommandQueue(Device device)
         {
             return new CommandQueue(this, device);
-        }
-
-        public CommandQueue[] CreateCommandQueues()
-        {
-            var commandQueues = new List<CommandQueue>();
-            foreach (var device in Devices)
-                commandQueues.Add(CreateCommandQueue(device));
-            return commandQueues.ToArray();
         }
 
         public CLProgram CreateProgram(string source)
@@ -135,7 +127,7 @@ namespace OpenCLforNet.PlatformLayer
 
         public void Release()
         {
-            OpenCL.CheckError(OpenCL.clReleaseContext(Pointer));
+            OpenCL.clReleaseContext(Pointer).CheckError();
         }
 
     }

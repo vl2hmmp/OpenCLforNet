@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenCLforNet.Memory
 {
-    public abstract class Buffer
+    public abstract class AbstractBuffer
     {
 
     }

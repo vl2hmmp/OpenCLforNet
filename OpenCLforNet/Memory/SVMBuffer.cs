@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCLforNet.PlatformLayer;
 using OpenCLforNet.Runtime;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Memory
 {
-    public unsafe class SVMBuffer : Buffer
+    public unsafe class SVMBuffer : AbstractBuffer
     {
 
         public long Size { get; }
@@ -28,14 +28,18 @@ namespace OpenCLforNet.Memory
             return Pointer;
         }
 
-        public void Mapping(CommandQueue commandQueue, bool blocking)
+        public Event Mapping(CommandQueue commandQueue, bool blocking)
         {
-            OpenCL.CheckError(OpenCL.clEnqueueSVMMap(commandQueue.Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), Pointer, new IntPtr(Size), 0, null, null));
+            void* event_ = null;
+            OpenCL.clEnqueueSVMMap(commandQueue.Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), Pointer, new IntPtr(Size), 0, null, &event_).CheckError();
+            return new Event(event_);
         }
 
-        public void UnMapping(CommandQueue commandQueue)
+        public Event UnMapping(CommandQueue commandQueue)
         {
-            OpenCL.CheckError(OpenCL.clEnqueueSVMUnmap(commandQueue.Pointer, Pointer, 0, null, null));
+            void* event_ = null;
+            OpenCL.clEnqueueSVMUnmap(commandQueue.Pointer, Pointer, 0, null, &event_).CheckError();
+            return new Event(event_);
         }
 
         public void Release()

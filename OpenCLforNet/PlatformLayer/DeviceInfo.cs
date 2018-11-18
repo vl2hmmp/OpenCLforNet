@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.PlatformLayer
 {
@@ -21,32 +21,33 @@ namespace OpenCLforNet.PlatformLayer
 
             // get a device
             uint count = 0;
-            OpenCL.CheckError(OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count));
+            OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
             var devices = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
-            OpenCL.CheckError(OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count));
-            var device = devices[index];
-
-            foreach (long info in Enum.GetValues(typeof(cl_device_info)))
+            try
             {
-                var a = Enum.GetName(typeof(cl_device_info), info);
-                var size = new IntPtr();
-                OpenCL.CheckError(OpenCL.clGetDeviceInfo(devices[index], info, IntPtr.Zero, null, &size));
-                byte[] value = new byte[(int)size];
-                fixed (byte* valuePointer = value)
+                OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
+
+                // get device infos
+                foreach (long info in Enum.GetValues(typeof(cl_device_info)))
                 {
-                    OpenCL.CheckError(OpenCL.clGetDeviceInfo(devices[index], info, size, valuePointer, null));
-                    infos.Add(Enum.GetName(typeof(cl_device_info), info), value);
+                    var a = Enum.GetName(typeof(cl_device_info), info);
+                    var size = new IntPtr();
+                    OpenCL.clGetDeviceInfo(devices[index], info, IntPtr.Zero, null, &size).CheckError();
+                    byte[] value = new byte[(int)size];
+                    fixed (byte* valuePointer = value)
+                    {
+                        OpenCL.clGetDeviceInfo(devices[index], info, size, valuePointer, null).CheckError();
+                        infos.Add(Enum.GetName(typeof(cl_device_info), info), value);
+                    }
                 }
             }
-        }
-
-        public List<String> Keys
-        {
-            get
+            finally
             {
-                return infos.Keys.ToList();
+                Marshal.FreeCoTaskMem(new IntPtr(devices));
             }
         }
+
+        public List<string> Keys { get => infos.Keys.ToList(); }
 
         public string GetValueAsString(string key)
         {
@@ -95,29 +96,7 @@ namespace OpenCLforNet.PlatformLayer
                 return array;
             }
         }
-
-        public Platform GetValueAsPlatform(string key)
-        {
-            void *platform;
-            if (IntPtr.Size == 4)
-                platform = (void *)(new IntPtr(BitConverter.ToInt32(infos[key], 0)));
-            else
-                platform = (void *)(new IntPtr(BitConverter.ToInt64(infos[key], 0)));
-
-            uint count = 0;
-            OpenCL.CheckError(OpenCL.clGetPlatformIDs(0, null, &count));
-            var platforms = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
-            OpenCL.CheckError(OpenCL.clGetPlatformIDs(count, platforms, &count));
-
-            for (var i = 0; i < count; i++)
-            {
-                if (platform == platforms[i])
-                    return new Platform(i);
-            }
-
-            return null;
-        }
-
+        
         public cl_device_type GetValueAsClDeviceType(string key)
         {
             return (cl_device_type)BitConverter.ToInt64(infos[key], 0);

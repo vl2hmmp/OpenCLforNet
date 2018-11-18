@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenCLforNet.RuntimeFunction
+namespace OpenCLforNet.Function
 {
 
     public enum cl_device_type : long
@@ -192,6 +192,15 @@ namespace OpenCLforNet.RuntimeFunction
         CL_PROGRAM_BUILD_LOG = 0x1183,
         CL_PROGRAM_BINARY_TYPE = 0x1184,
         CL_PROGRAM_BUILD_GLOBAL_VARIABLE_TOTAL_SIZE = 0x1185
+    }
+
+    public enum cl_profiling_info
+    {
+        CL_PROFILING_COMMAND_QUEUED = 0x1280,
+        CL_PROFILING_COMMAND_SUBMIT = 0x1281,
+        CL_PROFILING_COMMAND_START = 0x1282,
+        CL_PROFILING_COMMAND_END = 0x1283,
+        CL_PROFILING_COMMAND_COMPLETE = 0x1284
     }
 
     public enum cl_status_code

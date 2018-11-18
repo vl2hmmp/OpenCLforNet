@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCLforNet.PlatformLayer;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Memory
 {
@@ -17,7 +17,7 @@ namespace OpenCLforNet.Memory
             Context = context;
             int status = (int)cl_status_code.CL_SUCCESS;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, cl_mem_flags.CL_MEM_READ_WRITE, new IntPtr(size), null, &status);
-            OpenCL.CheckError(status);
+            status.CheckError();
         }
 
         public SimpleMemory(Context context, byte[] data, long size)
@@ -62,6 +62,16 @@ namespace OpenCLforNet.Memory
                 CreateSimpleMemory(context, dataPointer, size);
         }
 
+        public SimpleMemory(Context context, IntPtr data, long size)
+        {
+            CreateSimpleMemory(context, (void *)data, size);
+        }
+
+        public SimpleMemory(Context context, void *data, long size)
+        {
+            CreateSimpleMemory(context, data, size);
+        }
+
         private void CreateSimpleMemory(Context context, void* dataPointer, long size)
         {
             Size = size;
@@ -69,7 +79,7 @@ namespace OpenCLforNet.Memory
 
             int status = (int)cl_status_code.CL_SUCCESS;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, (cl_mem_flags.CL_MEM_COPY_HOST_PTR | cl_mem_flags.CL_MEM_READ_WRITE), new IntPtr(size), dataPointer, &status);
-            OpenCL.CheckError(status);
+            status.CheckError();
         }
 
     }

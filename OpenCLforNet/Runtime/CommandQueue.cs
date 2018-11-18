@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCLforNet.PlatformLayer;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Runtime
 {
@@ -13,30 +13,30 @@ namespace OpenCLforNet.Runtime
 
         public Context Context { get; }
         public Device Device { get; }
-        public void *Pointer { get; }
+        public void* Pointer { get; }
 
         public CommandQueue(Context context, Device device)
         {
             int status = (int)cl_status_code.CL_SUCCESS;
             Context = context;
             Device = device;
-            Pointer = OpenCL.clCreateCommandQueue(context.Pointer, device.Pointer, cl_command_queue_properties.CL_QUEUE_ON_DEVICE, &status);
-            OpenCL.CheckError(status);
+            Pointer = OpenCL.clCreateCommandQueue(context.Pointer, device.Pointer, cl_command_queue_properties.CL_QUEUE_PROFILING_ENABLE, &status);
+            status.CheckError();
         }
 
-        public void NDRangeKernel(Kernel kernel, long[] workSizes, params object[] args)
+        public Event NDRangeKernel(Kernel kernel, long[] workSizes, params object[] args)
         {
-            kernel.NDRange(this, workSizes, args);
+            return kernel.NDRange(this, workSizes, args);
         }
 
         public void WaitFinish()
         {
-            OpenCL.CheckError(OpenCL.clFinish(Pointer));
+            OpenCL.clFinish(Pointer).CheckError();
         }
 
         public void Release()
         {
-            OpenCL.CheckError(OpenCL.clReleaseCommandQueue(Pointer));
+            OpenCL.clReleaseCommandQueue(Pointer).CheckError();
         }
 
     }

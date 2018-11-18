@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using OpenCLforNet.Function;
 
-namespace OpenCLforNet.RuntimeFunction
+namespace OpenCLforNet
 {
-
-    unsafe partial class OpenCL
+    static class Extension
     {
 
-        public static void CheckError(int status)
+        public static void CheckError(this int status)
         {
             var code = (cl_status_code)Enum.ToObject(typeof(cl_status_code), status);
             if (code != cl_status_code.CL_SUCCESS)
@@ -21,5 +20,4 @@ namespace OpenCLforNet.RuntimeFunction
         }
 
     }
-
 }

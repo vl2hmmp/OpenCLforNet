@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCLforNet.PlatformLayer;
 using OpenCLforNet.Runtime;
-using OpenCLforNet.RuntimeFunction;
+using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Memory
 {
@@ -59,35 +59,48 @@ namespace OpenCLforNet.Memory
                 CreateMappingMemory(context, dataPointer, size);
         }
 
+        public MappingMemory(Context context, IntPtr data, long size)
+        {
+            CreateMappingMemory(context, (void *)data, size);
+        }
+
+        public MappingMemory(Context context, void *data, long size)
+        {
+            CreateMappingMemory(context, data, size);
+        }
+
         private void CreateMappingMemory(Context context, long size)
         {
-            int status = (int)cl_status_code.CL_SUCCESS;
+            int status;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, (cl_mem_flags.CL_MEM_ALLOC_HOST_PTR | cl_mem_flags.CL_MEM_READ_WRITE), new IntPtr(size), null, &status);
             Size = size;
             Context = context;
-            OpenCL.CheckError(status);
+            status.CheckError();
         }
 
         private void CreateMappingMemory(Context context, void* dataPointer, long size)
         {
-            int status = (int)cl_status_code.CL_SUCCESS;
+            int status;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, (cl_mem_flags.CL_MEM_USE_HOST_PTR | cl_mem_flags.CL_MEM_READ_WRITE), new IntPtr(size), dataPointer, &status);
             Size = size;
             Context = context;
-            OpenCL.CheckError(status);
+            status.CheckError();
         }
 
-        public void* Mapping(CommandQueue commandQueue, bool blocking, long offset, long size)
+        public Event Mapping(CommandQueue commandQueue, bool blocking, long offset, long size, out void* pointer)
         {
-            int status = (int)cl_status_code.CL_SUCCESS;
-            void* pointer = OpenCL.clEnqueueMapBuffer(commandQueue.Pointer, Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), new IntPtr(offset), new IntPtr(size), 0, null, null, &status);
-            OpenCL.CheckError(status);
-            return pointer;
+            int status;
+            void* event_ = null;
+            pointer = OpenCL.clEnqueueMapBuffer(commandQueue.Pointer, Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), new IntPtr(offset), new IntPtr(size), 0, null, &event_, &status);
+            status.CheckError();
+            return new Event(event_);
         }
 
-        public void UnMapping(CommandQueue commandQueue, void* pointer)
+        public Event UnMapping(CommandQueue commandQueue, void* pointer)
         {
-            OpenCL.CheckError(OpenCL.clEnqueueUnmapMemObject(commandQueue.Pointer, Pointer, pointer, 0, null, null));
+            void* event_ = null;
+            OpenCL.clEnqueueUnmapMemObject(commandQueue.Pointer, Pointer, pointer, 0, null, &event_).CheckError();
+            return new Event(event_);
         }
 
     }
