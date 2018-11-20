@@ -94,7 +94,7 @@ namespace OpenCLforNet.Runtime
         private uint Dimention = 1;
         private IntPtr* WorkSizes = (IntPtr*)Marshal.AllocCoTaskMem(3 * IntPtr.Size);
 
-        public void SetWorkSize(long[] workSizes)
+        public void SetWorkSize(params long[] workSizes)
         {
             if (workSizes.Length <= 0 || 4 <= workSizes.Length)
                 throw new ArgumentException("workSizes length is invalid.");
@@ -104,10 +104,17 @@ namespace OpenCLforNet.Runtime
                 WorkSizes[i] = new IntPtr(workSizes[i]);
         }
 
-        public Event NDRange(CommandQueue commandQueue)
+        public Event NDRange(CommandQueue commandQueue, params Event[] eventWaitList)
         {
             void* event_ = null;
-            OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, Dimention, null, WorkSizes, null, 0, null, &event_).CheckError();
+
+            var num = (uint)eventWaitList.Length;
+            var list = eventWaitList.Select(e => new IntPtr(e.Pointer)).ToArray();
+            fixed (void* listPointer = list)
+            {
+                OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, Dimention, null, WorkSizes, null, num, listPointer, &event_).CheckError();
+            }
+            
             return new Event(event_);
         }
 

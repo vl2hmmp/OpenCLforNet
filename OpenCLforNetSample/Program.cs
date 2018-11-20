@@ -12,9 +12,7 @@ namespace OpenCLforNetTest
     {
         static void Main(string[] args)
         {
-
-            Event event_;
-
+            
             foreach (var platformInfo in Platform.PlatformInfos)
             {
                 foreach (var key in platformInfo.Keys)
@@ -39,23 +37,23 @@ namespace OpenCLforNetTest
 
             var program = context.CreateProgram(source);
             var kernel = program.CreateKernel("testKernel");
+            kernel.SetWorkSize(4);
 
             
             Console.WriteLine("\nCL_MEM_READ_WRITE");
             var data = new float[] { 3F, 4.5F, 0F, -4.4F };
             var dataSize = (long)(sizeof(float) * 4);
             var simpleMemory = context.CreateSimpleMemory(dataSize);
-            event_ = simpleMemory.Write(commandQueue, true, data, 0, dataSize);
-            event_.Wait();
-            Console.WriteLine($"write time : {event_.ExecutionTime} ns");
-            event_ = kernel.NDRange(commandQueue, new long[] { 4 }, simpleMemory, 3F);
-            event_.Wait();
-            Console.WriteLine($"exec time : {event_.ExecutionTime} ns");
-            var result = new float[4];
-            event_ = simpleMemory.Read(commandQueue, true, result, 0, dataSize);
-            event_.Wait();
-            Console.WriteLine($"read time : {event_.ExecutionTime} ns");
-            ShowArray(result);
+            kernel.SetArgs(simpleMemory, 1F);
+
+            var event11 = simpleMemory.Write(commandQueue, true, data, 0, dataSize);
+            var event12 = kernel.NDRange(commandQueue, event11);
+            var event13 = simpleMemory.Read(commandQueue, true, data, 0, dataSize, event12);
+
+            Console.WriteLine($"write time : {event11.ExecutionTime} ns");
+            Console.WriteLine($"exec time : {event12.ExecutionTime} ns");
+            Console.WriteLine($"read time : {event13.ExecutionTime} ns");
+            ShowArray(data);
             simpleMemory.Release();
 
             
@@ -63,12 +61,13 @@ namespace OpenCLforNetTest
             data = new float[] { 3F, 4.5F, 0F, -4.4F };
             dataSize = sizeof(float) * 4;
             simpleMemory = context.CreateSimpleMemory(data, dataSize);
-            event_ = kernel.NDRange(commandQueue, new long[] { 4 }, simpleMemory, 3F);
-            event_.Wait();
-            Console.WriteLine($"exec time : {event_.ExecutionTime} ns");
-            event_ = simpleMemory.Read(commandQueue, true, data, 0, dataSize);
-            event_.Wait();
-            Console.WriteLine($"read time : {event_.ExecutionTime} ns");
+            kernel.SetArgs(simpleMemory, 2F);
+
+            var event21 = kernel.NDRange(commandQueue);
+            var event22 = simpleMemory.Read(commandQueue, true, data, 0, dataSize, event21);
+
+            Console.WriteLine($"exec time : {event21.ExecutionTime} ns");
+            Console.WriteLine($"read time : {event22.ExecutionTime} ns");
             ShowArray(data);
             simpleMemory.Release();
 
@@ -76,23 +75,23 @@ namespace OpenCLforNetTest
             Console.WriteLine("\nCL_MEM_ALLOC_HOST_PTR");
             dataSize = sizeof(float) * 4;
             var mappingMemory = context.CreateMappingMemory(dataSize);
-            event_ = mappingMemory.Mapping(commandQueue, true, 0, dataSize, out var p);
-            event_.Wait();
-            Console.WriteLine($"mapping time : {event_.ExecutionTime} ns");
+            kernel.SetArgs(mappingMemory, 3F);
+
+            var event31 = mappingMemory.Mapping(commandQueue, true, 0, dataSize, out var p);
+            event31.Wait();
             var pointer = (float*) p;
             pointer[0] = 3F;
             pointer[1] = 4.5F;
             pointer[2] = 0F;
             pointer[3] = -4.4F;
-            event_ = mappingMemory.UnMapping(commandQueue, pointer);
-            event_.Wait();
-            Console.WriteLine($"unmapping time : {event_.ExecutionTime} ns");
-            event_ = kernel.NDRange(commandQueue, new long[] { 4 }, mappingMemory, 3F);
-            event_.Wait();
-            Console.WriteLine($"exec time : {event_.ExecutionTime} ns");
-            event_ = mappingMemory.Read(commandQueue, true, data, 0, dataSize);
-            event_.Wait();
-            Console.WriteLine($"read time : {event_.ExecutionTime} ns");
+            var event32 = mappingMemory.UnMapping(commandQueue, pointer);
+            var event33 = kernel.NDRange(commandQueue, event32);
+            var event34 = mappingMemory.Read(commandQueue, true, data, 0, dataSize, event33);
+
+            Console.WriteLine($"mapping time : {event31.ExecutionTime} ns");
+            Console.WriteLine($"unmapping time : {event32.ExecutionTime} ns");
+            Console.WriteLine($"exec time : {event33.ExecutionTime} ns");
+            Console.WriteLine($"read time : {event34.ExecutionTime} ns");
             ShowArray(data);
             mappingMemory.Release();
 
@@ -101,12 +100,13 @@ namespace OpenCLforNetTest
             data = new float[] { 3F, 4.5F, 0F, -4.4F };
             dataSize = sizeof(float) * 4;
             mappingMemory = context.CreateMappingMemory(data, dataSize);
-            event_ = kernel.NDRange(commandQueue, new long[] { 4 }, mappingMemory, 3F);
-            event_.Wait();
-            Console.WriteLine($"exec time : {event_.ExecutionTime} ns");
-            event_ = mappingMemory.Read(commandQueue, true, data, 0, dataSize);
-            event_.Wait();
-            Console.WriteLine($"read time : {event_.ExecutionTime} ns");
+            kernel.SetArgs(mappingMemory, 4F);
+
+            var event41 = kernel.NDRange(commandQueue);
+            var event42 = mappingMemory.Read(commandQueue, true, data, 0, dataSize, event41);
+
+            Console.WriteLine($"exec time : {event41.ExecutionTime} ns");
+            Console.WriteLine($"read time : {event42.ExecutionTime} ns");
             ShowArray(data);
             mappingMemory.Release();
 
@@ -114,14 +114,16 @@ namespace OpenCLforNetTest
             Console.WriteLine("\nSVM");
             dataSize = sizeof(float) * 4;
             var svmBuffer = context.CreateSVMBuffer(dataSize, 0);
+            kernel.SetArgs(svmBuffer, 5F);
+
             pointer = (float*)svmBuffer.GetSVMPointer();
             pointer[0] = 3F;
             pointer[1] = 4.5F;
             pointer[2] = 0F;
             pointer[3] = -4.4F;
-            event_ = kernel.NDRange(commandQueue, new long[] { 4, 0, 0 }, svmBuffer, 3F);
-            event_.Wait();
-            Console.WriteLine($"exec time : {event_.ExecutionTime} ns");
+            var event51 = kernel.NDRange(commandQueue);
+
+            Console.WriteLine($"exec time : {event51.ExecutionTime} ns");
             Console.Write("result : [  ");
             for (var i = 0; i < 4; i++)
                 Console.Write($"{pointer[i]}  ");

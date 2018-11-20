@@ -24,9 +24,9 @@ namespace OpenCLforNet.Runtime
             status.CheckError();
         }
 
-        public Event NDRangeKernel(Kernel kernel, long[] workSizes, params object[] args)
+        public Event NDRangeKernel(Kernel kernel, params Event[] eventWaitList)
         {
-            return kernel.NDRange(this, workSizes, args);
+            return kernel.NDRange(this, eventWaitList);
         }
 
         public void WaitFinish()
