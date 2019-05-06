@@ -71,6 +71,9 @@ namespace OpenCLforNet.Function
         public static extern int clEnqueueUnmapMemObject(void* command_queue, void* memobj, void* mapped_ptr, uint num_events_in_wait_list, void* event_wait_list, void** event_);
 
         [DllImport("OpenCL.dll")]
+        public static extern int clEnqueueCopyBuffer(void* command_queue, void* src_buffer, void* dst_buffer, size_t src_offset, size_t dst_offset, size_t cb, uint num_events_in_wait_list, void* event_wait_list, void** event_);
+
+        [DllImport("OpenCL.dll")]
         public static extern int clReleaseMemObject(void* mem);
 
         [DllImport("OpenCL.dll")]

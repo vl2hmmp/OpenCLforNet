@@ -32,14 +32,20 @@ namespace OpenCLforNet.Runtime
                 }
             }
 
+            var optionBuilder = new StringBuilder();
+            optionBuilder.Append("-cl-std=CL2.0");
+            var option = Encoding.UTF8.GetBytes(optionBuilder.ToString());
+
             try
             {
                 var devices = context.Devices;
                 var devicePointers = (void**)Marshal.AllocCoTaskMem((devices.Length * IntPtr.Size));
                 for (var i = 0; i < devices.Length; i++)
                     devicePointers[i] = devices[i].Pointer;
-                OpenCL.clBuildProgram(Pointer, (uint)devices.Length, devicePointers, null, null, null).CheckError();
-                
+                fixed (byte* optionPointer = option)
+                {
+                    OpenCL.clBuildProgram(Pointer, (uint)devices.Length, devicePointers, optionPointer, null, null).CheckError();
+                }
             }
             catch (Exception e)
             {

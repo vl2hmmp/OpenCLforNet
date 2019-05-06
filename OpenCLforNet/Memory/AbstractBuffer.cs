@@ -9,5 +9,7 @@ namespace OpenCLforNet.Memory
     public abstract class AbstractBuffer
     {
 
+        public abstract void Release();
+
     }
 }

@@ -120,9 +120,9 @@ namespace OpenCLforNet.PlatformLayer
             return new MappingMemory(this, data, size);
         }
 
-        public SVMBuffer CreateSVMBuffer(long size, uint alignment)
+        public SVMBuffer<Type> CreateSVMBuffer<Type>(long size, uint alignment = 0) where Type : struct
         {
-            return new SVMBuffer(this, size, alignment);
+            return new SVMBuffer<Type>(this, size, alignment);
         }
 
         public void Release()

@@ -26,7 +26,7 @@ namespace OpenCLforNet.Runtime
 
         public Event NDRangeKernel(Kernel kernel, params Event[] eventWaitList)
         {
-            return kernel.NDRange(this, eventWaitList);
+            return kernel.NDRange(commandQueue: this, eventWaitList: eventWaitList);
         }
 
         public void WaitFinish()
