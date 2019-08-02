@@ -40,6 +40,12 @@ namespace OpenCLforNet.PlatformLayer
             return new CLProgram(source, this);
         }
 
+        public Kernel CreateKernel(string source, string kernelName)
+        {
+            var program = new CLProgram(source, this);
+            return program.CreateKernel(kernelName);
+        }
+
         public SimpleMemory CreateSimpleMemory(long size)
         {
             return new SimpleMemory(this, size);
@@ -120,9 +126,9 @@ namespace OpenCLforNet.PlatformLayer
             return new MappingMemory(this, data, size);
         }
 
-        public SVMBuffer<Type> CreateSVMBuffer<Type>(long size, uint alignment = 0) where Type : struct
+        public SVMBuffer<Type> CreateSVMBuffer<Type>(int lengthX, int lengthY = 1, int lengthZ = 1, uint alignment = 0) where Type : struct
         {
-            return new SVMBuffer<Type>(this, size, alignment);
+            return new SVMBuffer<Type>(this, lengthX, lengthY, lengthZ, alignment);
         }
 
         public void Release()

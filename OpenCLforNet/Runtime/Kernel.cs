@@ -123,7 +123,7 @@ namespace OpenCLforNet.Runtime
             if (workSizes.Length <= 0 || 4 <= workSizes.Length)
                 throw new ArgumentException("workSizes length is invalid.");
 
-            Dimention = (uint)workSizes.Rank;
+            Dimention = (uint)workSizes.Length;
             for (var i = 0; i < Dimention; i++)
                 WorkSizes[i] = new IntPtr(workSizes[i]);
         }

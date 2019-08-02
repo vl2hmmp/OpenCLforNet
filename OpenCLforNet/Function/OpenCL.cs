@@ -80,6 +80,9 @@ namespace OpenCLforNet.Function
         public static extern void* clSVMAlloc(void* context, cl_mem_flags flags, size_t size, uint alignment);
 
         [DllImport("OpenCL.dll")]
+        public static extern int clEnqueueSVMMemcpy(void* command_queue, bool blocking_copy, void* dst_ptr, void* src_ptr, size_t size, uint num_events_in_wait_list, void* event_wait_list, void** _event);
+
+        [DllImport("OpenCL.dll")]
         public static extern int clEnqueueSVMMap(void* command_queue, bool blocking_map, cl_map_flags map_flags, void* svm_ptr, size_t size, uint num_events_in_wait_list, void* event_wait_list, void** event_);
 
         [DllImport("OpenCL.dll")]
