@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenCLforNet.Memory;
 using OpenCLforNet.PlatformLayer;
 using OpenCLforNet.Runtime;
 
@@ -113,7 +114,7 @@ namespace OpenCLforNetTest
 
             
             Console.WriteLine("\nSVM");
-            var svmBuffer = context.CreateSVMBuffer<float>(4, 0);
+            var svmBuffer = context.CreateSVMBuffer<float>(4);
             kernel.SetArgs(svmBuffer, 5F);
 
             svmBuffer[0] = 3F;
