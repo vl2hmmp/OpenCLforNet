@@ -21,7 +21,7 @@ namespace OpenCLforNet.Runtime
             KernelName = kernelName;
             Program = program;
 
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status = cl_status_code.CL_SUCCESS;
             var kernelNameArray = Encoding.UTF8.GetBytes(kernelName);
             fixed (byte* kernelNameArrayPointer = kernelNameArray)
             {

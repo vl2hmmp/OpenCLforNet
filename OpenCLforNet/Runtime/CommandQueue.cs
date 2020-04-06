@@ -17,7 +17,7 @@ namespace OpenCLforNet.Runtime
 
         public CommandQueue(Context context, Device device)
         {
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status = cl_status_code.CL_SUCCESS;
             Context = context;
             Device = device;
             Pointer = OpenCL.clCreateCommandQueue(context.Pointer, device.Pointer, cl_command_queue_properties.CL_QUEUE_PROFILING_ENABLE, &status);

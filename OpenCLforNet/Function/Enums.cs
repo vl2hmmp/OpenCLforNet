@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace OpenCLforNet.Function
 {
+    using cl_bitfield = UInt64;
+    using cl_uint = UInt32;
+    using cl_int = Int32;
 
-    public enum cl_device_type : long
+    // see https://github.com/KhronosGroup/OpenCL-Headers/blob/master/CL/cl.h
+
+    public enum cl_device_type : cl_bitfield
     {
         CL_DEVICE_TYPE_DEFAULT = (1 << 0),
         CL_DEVICE_TYPE_CPU = (1 << 1),
@@ -16,7 +21,7 @@ namespace OpenCLforNet.Function
         CL_DEVICE_TYPE_ALL = 0xFFFFFFFF
     }
 
-    public enum cl_platform_info : long
+    public enum cl_platform_info : cl_uint
     {
         CL_PLATFORM_PROFILE = 0x0900,
         CL_PLATFORM_VERSION = 0x0901,
@@ -25,7 +30,7 @@ namespace OpenCLforNet.Function
         CL_PLATFORM_EXTENSIONS = 0x0904
     }
 
-    public enum cl_device_info : long
+    public enum cl_device_info : cl_uint
     {
         CL_DEVICE_TYPE = 0x1000,
         CL_DEVICE_VENDOR_ID = 0x1001,
@@ -121,7 +126,7 @@ namespace OpenCLforNet.Function
         CL_DEVICE_SUB_GROUP_INDEPENDENT_FORWARD_PROGRESS = 0x105D
     }
 
-    public enum cl_device_fp_config : long
+    public enum cl_device_fp_config : cl_bitfield
     {
         CL_FP_DENORM = (1 << 0),
         CL_FP_INF_NAN = (1 << 1),
@@ -133,26 +138,26 @@ namespace OpenCLforNet.Function
         CL_FP_CORRECTLY_ROUNDED_DIVIDE_SQRT = (1 << 7)
     }
 
-    public enum cl_device_mem_cache_type : long
+    public enum cl_device_mem_cache_type : cl_uint
     {
         CL_NONE = 0x0,
         CL_READ_ONLY_CACHE = 0x1,
         CL_READ_WRITE_CACHE = 0x2
     }
 
-    public enum cl_device_local_mem_type : long
+    public enum cl_device_local_mem_type : cl_uint
     {
         CL_LOCAL = 0x1,
         CL_GLOBAL = 0x2
     }
 
-    public enum cl_device_exec_capabilities : long
+    public enum cl_device_exec_capabilities : cl_bitfield
     {
         CL_EXEC_KERNEL = (1 << 0),
         CL_EXEC_NATIVE_KERNEL = (1 << 1)
     }
 
-    public enum cl_command_queue_properties : long
+    public enum cl_command_queue_properties : cl_bitfield
     {
         CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE = (1 << 0),
         CL_QUEUE_PROFILING_ENABLE = (1 << 1),
@@ -160,7 +165,7 @@ namespace OpenCLforNet.Function
         CL_QUEUE_ON_DEVICE_DEFAULT = (1 << 3)
     }
 
-    public enum cl_mem_flags : long
+    public enum cl_mem_flags : cl_bitfield
     {
         CL_MEM_READ_WRITE = (1 << 0),
         CL_MEM_WRITE_ONLY = (1 << 1),
@@ -170,14 +175,14 @@ namespace OpenCLforNet.Function
         CL_MEM_COPY_HOST_PTR = (1 << 5)
     }
 
-    public enum cl_map_flags : long
+    public enum cl_map_flags : cl_bitfield
     {
         CL_MAP_READ = (1 << 0),
         CL_MAP_WRITE = (1 << 1),
         CL_MAP_WRITE_INVALIDATE_REGION = (1 << 2)
     }
 
-    public enum cl_device_svm_capabilities : long
+    public enum cl_device_svm_capabilities : cl_bitfield
     {
         CL_DEVICE_SVM_COARSE_GRAIN_BUFFER = (1 << 0),
         CL_DEVICE_SVM_FINE_GRAIN_BUFFER = (1 << 1),
@@ -185,7 +190,7 @@ namespace OpenCLforNet.Function
         CL_DEVICE_SVM_ATOMICS = (1 << 3)
     }
 
-    public enum cl_program_build_info : long
+    public enum cl_program_build_info : cl_uint
     {
         CL_PROGRAM_BUILD_STATUS = 0x1181,
         CL_PROGRAM_BUILD_OPTIONS = 0x1182,
@@ -194,7 +199,7 @@ namespace OpenCLforNet.Function
         CL_PROGRAM_BUILD_GLOBAL_VARIABLE_TOTAL_SIZE = 0x1185
     }
 
-    public enum cl_profiling_info
+    public enum cl_profiling_info : cl_uint
     {
         CL_PROFILING_COMMAND_QUEUED = 0x1280,
         CL_PROFILING_COMMAND_SUBMIT = 0x1281,
@@ -203,7 +208,7 @@ namespace OpenCLforNet.Function
         CL_PROFILING_COMMAND_COMPLETE = 0x1284
     }
 
-    public enum cl_status_code
+    public enum cl_status_code : cl_int
     {
         CL_SUCCESS = 0,
         CL_DEVICE_NOT_FOUND = -1,

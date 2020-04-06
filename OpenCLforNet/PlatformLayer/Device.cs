@@ -23,12 +23,12 @@ namespace OpenCLforNet.PlatformLayer
 
             // get a device
             uint count = 0;
-            OpenCL.clGetDeviceIDs(platform.Pointer, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
+            OpenCL.clGetDeviceIDs(platform.Pointer, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
 
-            var devices = (void **)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
+            var devices = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
             try
             {
-                OpenCL.clGetDeviceIDs(platform.Pointer, (long)cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
+                OpenCL.clGetDeviceIDs(platform.Pointer, cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
                 Pointer = devices[index];
             }
             finally

@@ -14,13 +14,13 @@ namespace OpenCLforNet.PlatformLayer
     {
 
         public Device[] Devices { get; }
-        public void *Pointer { get; }
+        public void* Pointer { get; }
 
         public Context(params Device[] devices)
         {
             Devices = devices;
 
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status = cl_status_code.CL_SUCCESS;
             var devicePointers = (void**)Marshal.AllocCoTaskMem(devices.Length * IntPtr.Size);
             for (var i = 0; i < devices.Length; i++)
                 devicePointers[i] = devices[i].Pointer;

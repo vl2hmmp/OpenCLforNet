@@ -15,29 +15,35 @@ namespace OpenCLforNet.PlatformLayer
 
         private Dictionary<string, byte[]> infos = new Dictionary<string, byte[]>();
 
-        internal DeviceInfo(void * platform, int index)
+        internal DeviceInfo(void* platform, int index)
         {
             Index = index;
 
             // get a device
             uint count = 0;
-            OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
+            OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
             var devices = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
             try
             {
-                OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
+                OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
 
                 // get device infos
-                foreach (long info in Enum.GetValues(typeof(cl_device_info)))
+                foreach (cl_device_info info in Enum.GetValues(typeof(cl_device_info)))
                 {
                     var a = Enum.GetName(typeof(cl_device_info), info);
                     var size = new IntPtr();
-                    OpenCL.clGetDeviceInfo(devices[index], info, IntPtr.Zero, null, &size).CheckError();
-                    byte[] value = new byte[(int)size];
-                    fixed (byte* valuePointer = value)
+                    var status = OpenCL.clGetDeviceInfo(devices[index], info, IntPtr.Zero, null, &size);
+
+                    // サポートしている場合は値を取得
+                    if (status != cl_status_code.CL_INVALID_VALUE)
                     {
-                        OpenCL.clGetDeviceInfo(devices[index], info, size, valuePointer, null).CheckError();
-                        infos.Add(Enum.GetName(typeof(cl_device_info), info), value);
+                        status.CheckError();
+                        byte[] value = new byte[(int)size];
+                        fixed (byte* valuePointer = value)
+                        {
+                            OpenCL.clGetDeviceInfo(devices[index], info, size, valuePointer, null).CheckError();
+                            infos.Add(Enum.GetName(typeof(cl_device_info), info), value);
+                        }
                     }
                 }
             }
@@ -96,7 +102,7 @@ namespace OpenCLforNet.PlatformLayer
                 return array;
             }
         }
-        
+
         public cl_device_type GetValueAsClDeviceType(string key)
         {
             return (cl_device_type)BitConverter.ToInt64(infos[key], 0);

@@ -14,7 +14,7 @@ namespace OpenCLforNet.Memory
 
         public long Size { get; }
         public Context Context { get; }
-        public void *Pointer { get; }
+        public void* Pointer { get; }
 
         public SVMBuffer(Context context, long size, uint alignment)
         {

@@ -36,7 +36,7 @@ namespace OpenCLforNet.PlatformLayer
             }
 
             // get platform infos
-            foreach (long info in Enum.GetValues(typeof(cl_platform_info)))
+            foreach (cl_platform_info info in Enum.GetValues(typeof(cl_platform_info)))
             {
                 var size = new IntPtr();
                 OpenCL.clGetPlatformInfo(platform, info, IntPtr.Zero, null, &size).CheckError();
@@ -49,7 +49,7 @@ namespace OpenCLforNet.PlatformLayer
             }
             
             // get devices
-            OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
+            OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
 
             // create device infos
             for (int i = 0; i < count; i++)

@@ -19,7 +19,7 @@ namespace OpenCLforNet.Runtime
         {
             Context = context;
 
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status= cl_status_code.CL_SUCCESS;
             var sourceArray = Encoding.UTF8.GetBytes(source);
             var lengths = (void *)(new IntPtr(source.Length));
             fixed (byte* sourceArrayPointer = sourceArray)
