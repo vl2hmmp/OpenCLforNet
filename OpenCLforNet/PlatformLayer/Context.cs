@@ -10,8 +10,9 @@ using OpenCLforNet.Function;
 
 namespace OpenCLforNet.PlatformLayer
 {
-    public unsafe class Context
+    public unsafe class Context : IDisposable
     {
+        private bool isDisposed = false;
 
         public Device[] Devices { get; }
         public void* Pointer { get; }
@@ -29,6 +30,29 @@ namespace OpenCLforNet.PlatformLayer
             Pointer = OpenCL.clCreateContext(null, (uint)devices.Length, devicePointers, null, null, &status);
             status.CheckError();
         }
+
+        ~Context() => Dispose(false);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool includeManaged)
+        {
+            if (!isDisposed)
+            {
+                if (includeManaged)
+                    DisposeManaged();
+
+                DisposeUnManaged();
+                isDisposed = true;
+            }
+        }
+
+        public CommandQueue CreateCommandQueue(int idx = 0)
+            => CreateCommandQueue(Devices[idx]);
 
         public CommandQueue CreateCommandQueue(Device device)
         {
@@ -125,10 +149,13 @@ namespace OpenCLforNet.PlatformLayer
             return new SVMBuffer(this, size, alignment);
         }
 
-        public void Release()
+        protected void DisposeUnManaged()
         {
             OpenCL.clReleaseContext(Pointer).CheckError();
         }
 
+        protected virtual void DisposeManaged() { }
+
+        public virtual void Release() => Dispose();
     }
 }

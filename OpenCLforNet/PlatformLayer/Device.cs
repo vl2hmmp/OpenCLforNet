@@ -16,6 +16,8 @@ namespace OpenCLforNet.PlatformLayer
         public void* Pointer { get; }
         public DeviceInfo Info { get; }
 
+        public Device() : this(new Platform(0), 0) { }
+
         public Device(Platform platform, int index)
         {
             Platform = platform;

@@ -8,8 +8,9 @@ using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Runtime
 {
-    public unsafe class CommandQueue
+    public unsafe class CommandQueue : IDisposable
     {
+        private bool isDisposed = false;
 
         public Context Context { get; }
         public Device Device { get; }
@@ -24,6 +25,25 @@ namespace OpenCLforNet.Runtime
             status.CheckError();
         }
 
+        ~CommandQueue() => Dispose(false);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool includeManaged)
+        {
+            if (!isDisposed)
+            {
+                if (includeManaged)
+                    DisposeManaged();
+
+                DisposeUnManaged();
+                isDisposed = true;
+            }
+        }
         public Event NDRangeKernel(Kernel kernel, params Event[] eventWaitList)
         {
             return kernel.NDRange(this, eventWaitList);
@@ -34,10 +54,13 @@ namespace OpenCLforNet.Runtime
             OpenCL.clFinish(Pointer).CheckError();
         }
 
-        public void Release()
+        protected void DisposeUnManaged()
         {
             OpenCL.clReleaseCommandQueue(Pointer).CheckError();
         }
 
+        protected virtual void DisposeManaged() { }
+
+        public virtual void Release() => Dispose();
     }
 }

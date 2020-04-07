@@ -11,10 +11,9 @@ namespace OpenCLforNet.Memory
 {
     public abstract unsafe class AbstractMemory : AbstractBuffer
     {
-
         public long Size { get; protected set; }
         public Context Context { get; protected set; }
-        public void *Pointer { get; protected set; }
+        public void* Pointer { get; protected set; }
 
         public Event Write(CommandQueue commandQueue, bool blocking, byte[] data, long offset, long size, params Event[] eventWaitList)
         {
@@ -87,7 +86,7 @@ namespace OpenCLforNet.Memory
             {
                 OpenCL.clEnqueueWriteBuffer(commandQueue.Pointer, Pointer, blocking, new IntPtr(offset), new IntPtr(size), data, num, listPointer, &event_).CheckError();
             }
-            
+
             return new Event(event_);
         }
 
@@ -152,7 +151,7 @@ namespace OpenCLforNet.Memory
             return Read(commandQueue, blocking, (void*)data, offset, size, eventWaitList);
         }
 
-        public Event Read(CommandQueue commandQueue, bool blocking, void *data, long offset, long size, params Event[] eventWaitList)
+        public Event Read(CommandQueue commandQueue, bool blocking, void* data, long offset, long size, params Event[] eventWaitList)
         {
             void* event_ = null;
 
@@ -162,14 +161,17 @@ namespace OpenCLforNet.Memory
             {
                 OpenCL.clEnqueueReadBuffer(commandQueue.Pointer, Pointer, blocking, new IntPtr(offset), new IntPtr(size), data, num, listPointer, &event_).CheckError();
             }
-            
+
             return new Event(event_);
         }
 
-        public void Release()
+        protected override void DisposeManaged()
+        {
+        }
+
+        protected override void DisposeUnManaged()
         {
             OpenCL.clReleaseMemObject(Pointer).CheckError();
         }
-
     }
 }
