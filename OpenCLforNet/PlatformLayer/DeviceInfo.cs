@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using OpenCLforNet.Function;
+using static OpenCLforNet.Function.ClDeviceInfo;
 
 namespace OpenCLforNet.PlatformLayer
 {
     public unsafe class DeviceInfo
     {
-
         public int Index { get; }
 
         private Dictionary<string, byte[]> infos = new Dictionary<string, byte[]>();
@@ -54,6 +54,39 @@ namespace OpenCLforNet.PlatformLayer
         }
 
         public List<string> Keys { get => infos.Keys.ToList(); }
+
+        public bool ContainsKey(string key) => infos.ContainsKey(key);
+        public bool ContainsKey(IClDeviceInfoFor key) => infos.ContainsKey(key.Name);
+
+        public T Get<T>(ClDeviceInfoFor<T> deviceInfo) => deviceInfo.Get(this);
+
+        public bool TryGet(IClDeviceInfoFor deviceinfo, out object val)
+        {
+            if (infos.ContainsKey(deviceinfo.Name))
+            {
+                val = deviceinfo.Get(this);
+                return true;
+            }
+            else
+            {
+                val = default(object);
+                return false;
+            }
+        }
+
+        public bool TryGet<T>(ClDeviceInfoFor<T> deviceInfo, out T val)
+        {
+            if (infos.ContainsKey(deviceInfo.Name))
+            {
+                val = deviceInfo.Get(this);
+                return true;
+            }
+            else
+            {
+                val = default(T);
+                return false;
+            }
+        }
 
         public string GetValueAsString(string key)
         {
@@ -105,22 +138,22 @@ namespace OpenCLforNet.PlatformLayer
 
         public cl_device_type GetValueAsClDeviceType(string key)
         {
-            return (cl_device_type)BitConverter.ToInt64(infos[key], 0);
+            return (cl_device_type)BitConverter.ToUInt64(infos[key], 0);
         }
 
         public cl_device_fp_config GetValueAsClDeviceFpConfig(string key)
         {
-            return (cl_device_fp_config)BitConverter.ToInt64(infos[key], 0);
+            return (cl_device_fp_config)BitConverter.ToUInt64(infos[key], 0);
         }
 
         public cl_device_mem_cache_type GetValueAsClDeviceMemCacheType(string key)
         {
-            return (cl_device_mem_cache_type)BitConverter.ToInt64(infos[key], 0);
+            return (cl_device_mem_cache_type)BitConverter.ToUInt32(infos[key], 0);
         }
 
         public cl_device_local_mem_type GetValueAsClDeviceLocalMemType(string key)
         {
-            return (cl_device_local_mem_type)BitConverter.ToInt64(infos[key], 0);
+            return (cl_device_local_mem_type)BitConverter.ToUInt32(infos[key], 0);
         }
 
         public cl_device_exec_capabilities GetValueAsClDeviceExecCapabilities(string key)

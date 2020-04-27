@@ -23,7 +23,7 @@ namespace OpenCLforNet.PlatformLayer
             // get a platform
             uint count = 0;
             OpenCL.clGetPlatformIDs(0, null, &count).CheckError();
-            var platforms = (void **)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
+            var platforms = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
             void* platform;
             try
             {
@@ -47,7 +47,7 @@ namespace OpenCLforNet.PlatformLayer
                     infos.Add(Enum.GetName(typeof(cl_platform_info), info), value);
                 }
             }
-            
+
             // get devices
             OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
 
@@ -58,9 +58,25 @@ namespace OpenCLforNet.PlatformLayer
 
         public List<string> Keys { get => infos.Keys.ToList(); }
 
+        public bool ContainsKey(string key) => infos.ContainsKey(key);
+
         public string this[string key]
         {
             get => Encoding.UTF8.GetString(infos[key], 0, infos[key].Length).Trim();
+        }
+
+        public bool TryGet(string key, out string val)
+        {
+            if (infos.ContainsKey(key))
+            {
+                val = this[key];
+                return true;
+            }
+            else
+            {
+                val = default(string);
+                return false;
+            }
         }
 
         public string GetValueAsString(string key)
