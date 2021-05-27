@@ -7,7 +7,7 @@ using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Runtime
 {
-    public unsafe class Event
+    public unsafe class Event: IDisposable
     {
 
         private long? executionTime = null;
@@ -27,11 +27,20 @@ namespace OpenCLforNet.Runtime
                 return (long)executionTime;
             }
         }
-        public void* Pointer { get; }
+
+        readonly void* _Pointer;
+        public void* Pointer 
+        { 
+            get 
+            {
+                if (disposed) { throw new ObjectDisposedException(nameof(Event)); }
+                else { return _Pointer; }
+            }
+        }
 
         internal Event(void* pointer)
         {
-            Pointer = pointer;
+            _Pointer = pointer;
         }
 
         public void Wait()
@@ -40,5 +49,17 @@ namespace OpenCLforNet.Runtime
             OpenCL.clWaitForEvents(1, &event_);
         }
 
+        private bool disposed;
+        public void Dispose()
+        {
+            if (disposed) { return; }
+            disposed = true;
+            OpenCL.clReleaseEvent(Pointer);
+            GC.SuppressFinalize(this);
+        }
+        ~Event() 
+        {
+            Dispose(); 
+        }
     }
 }
