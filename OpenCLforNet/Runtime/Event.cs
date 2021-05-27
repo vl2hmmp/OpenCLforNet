@@ -53,8 +53,8 @@ namespace OpenCLforNet.Runtime
         public void Dispose()
         {
             if (disposed) { return; }
-            disposed = true;
             OpenCL.clReleaseEvent(Pointer);
+            disposed = true;
             GC.SuppressFinalize(this);
         }
         ~Event() 
