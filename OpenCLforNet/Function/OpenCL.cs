@@ -98,6 +98,9 @@ namespace OpenCLforNet.Function
         public static extern int clWaitForEvents(uint num_events, void** event_list);
 
         [DllImport("OpenCL.dll")]
+        public static extern int clReleaseEvent(void* event_);
+
+        [DllImport("OpenCL.dll")]
         public static extern int clGetEventProfilingInfo(void* event_, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret);
 
         [DllImport("OpenCL.dll")]
