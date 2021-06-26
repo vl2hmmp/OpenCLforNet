@@ -22,6 +22,14 @@ namespace OpenCLforNet.PlatformLayer
             // create platform infos
             for (int i = 0; i < count; i++)
                 PlatformInfos.Add(new PlatformInfo(i));
+
+            PlatformInfos.Sort((a, b) =>
+            {
+                if (a.IsDeviceInfoObtainable && !b.IsDeviceInfoObtainable) return -1;
+                if (!a.IsDeviceInfoObtainable && b.IsDeviceInfoObtainable) return 1;
+                return 0;
+            });
+
         }
 
         public int Index { get; }

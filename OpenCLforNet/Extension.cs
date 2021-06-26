@@ -9,9 +9,12 @@ namespace OpenCLforNet
 {
     static class Extension
     {
+        public static bool HasError(this cl_status_code code)
+            => code != cl_status_code.CL_SUCCESS;
+
         public static void CheckError(this cl_status_code code)
         {
-            if (code != cl_status_code.CL_SUCCESS)
+            if (HasError(code))
             {
                 throw new Exception(Enum.GetName(typeof(cl_status_code), code));
             }

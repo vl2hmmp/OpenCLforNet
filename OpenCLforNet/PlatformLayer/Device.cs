@@ -20,6 +20,11 @@ namespace OpenCLforNet.PlatformLayer
 
         public Device(Platform platform, int index)
         {
+            if (!platform.Info.IsDeviceInfoObtainable)
+                throw new ArgumentException("This platform has invalid device info.");
+            if (platform.Info.DeviceInfos.Count <= index)
+                throw new IndexOutOfRangeException();
+
             Platform = platform;
             Index = index;
 
@@ -38,7 +43,7 @@ namespace OpenCLforNet.PlatformLayer
                 Marshal.FreeCoTaskMem(new IntPtr(devices));
             }
 
-            Info = Platform.PlatformInfos[platform.Index].DeviceInfos[index];
+            Info = platform.Info.DeviceInfos[index];
         }
 
         public Context CreateContext()

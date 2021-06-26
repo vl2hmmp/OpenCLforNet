@@ -13,6 +13,7 @@ namespace OpenCLforNet.PlatformLayer
 
         public int Index { get; }
         public List<DeviceInfo> DeviceInfos { get; } = new List<DeviceInfo>();
+        public bool IsDeviceInfoObtainable { get; }
 
         private Dictionary<string, byte[]> infos = new Dictionary<string, byte[]>();
 
@@ -49,11 +50,15 @@ namespace OpenCLforNet.PlatformLayer
             }
 
             // get devices
-            OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
+            var deviceIdStatus = OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count);
 
-            // create device infos
-            for (int i = 0; i < count; i++)
-                DeviceInfos.Add(new DeviceInfo(platform, i));
+            IsDeviceInfoObtainable = !deviceIdStatus.HasError();
+            if (IsDeviceInfoObtainable)
+            {
+                // create device infos
+                for (int i = 0; i < count; i++)
+                    DeviceInfos.Add(new DeviceInfo(platform, i));
+            }
         }
 
         public List<string> Keys { get => infos.Keys.ToList(); }
