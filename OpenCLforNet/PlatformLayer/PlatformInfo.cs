@@ -13,6 +13,7 @@ namespace OpenCLforNet.PlatformLayer
 
         public int Index { get; }
         public List<DeviceInfo> DeviceInfos { get; } = new List<DeviceInfo>();
+        public bool IsDeviceInfoObtainable { get; }
 
         private Dictionary<string, byte[]> infos = new Dictionary<string, byte[]>();
 
@@ -23,7 +24,7 @@ namespace OpenCLforNet.PlatformLayer
             // get a platform
             uint count = 0;
             OpenCL.clGetPlatformIDs(0, null, &count).CheckError();
-            var platforms = (void **)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
+            var platforms = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
             void* platform;
             try
             {
@@ -36,7 +37,7 @@ namespace OpenCLforNet.PlatformLayer
             }
 
             // get platform infos
-            foreach (long info in Enum.GetValues(typeof(cl_platform_info)))
+            foreach (cl_platform_info info in Enum.GetValues(typeof(cl_platform_info)))
             {
                 var size = new IntPtr();
                 OpenCL.clGetPlatformInfo(platform, info, IntPtr.Zero, null, &size).CheckError();
@@ -47,20 +48,40 @@ namespace OpenCLforNet.PlatformLayer
                     infos.Add(Enum.GetName(typeof(cl_platform_info), info), value);
                 }
             }
-            
-            // get devices
-            OpenCL.clGetDeviceIDs(platform, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
 
-            // create device infos
-            for (int i = 0; i < count; i++)
-                DeviceInfos.Add(new DeviceInfo(platform, i));
+            // get devices
+            var deviceIdStatus = OpenCL.clGetDeviceIDs(platform, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count);
+
+            IsDeviceInfoObtainable = !deviceIdStatus.HasError();
+            if (IsDeviceInfoObtainable)
+            {
+                // create device infos
+                for (int i = 0; i < count; i++)
+                    DeviceInfos.Add(new DeviceInfo(platform, i));
+            }
         }
 
         public List<string> Keys { get => infos.Keys.ToList(); }
 
+        public bool ContainsKey(string key) => infos.ContainsKey(key);
+
         public string this[string key]
         {
             get => Encoding.UTF8.GetString(infos[key], 0, infos[key].Length).Trim();
+        }
+
+        public bool TryGet(string key, out string val)
+        {
+            if (infos.ContainsKey(key))
+            {
+                val = this[key];
+                return true;
+            }
+            else
+            {
+                val = default(string);
+                return false;
+            }
         }
 
         public string GetValueAsString(string key)

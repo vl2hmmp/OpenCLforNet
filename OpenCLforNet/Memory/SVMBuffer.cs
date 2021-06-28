@@ -14,7 +14,7 @@ namespace OpenCLforNet.Memory
 
         public long Size { get; }
         public Context Context { get; }
-        public void *Pointer { get; }
+        public void* Pointer { get; }
 
         public SVMBuffer(Context context, long size, uint alignment)
         {
@@ -42,10 +42,13 @@ namespace OpenCLforNet.Memory
             return new Event(event_);
         }
 
-        public void Release()
+        protected override void DisposeManaged()
+        {
+        }
+
+        protected override void DisposeUnManaged()
         {
             OpenCL.clSVMFree(Context.Pointer, Pointer);
         }
-
     }
 }

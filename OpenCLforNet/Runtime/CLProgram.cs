@@ -9,8 +9,9 @@ using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Runtime
 {
-    public unsafe class CLProgram
+    public unsafe class CLProgram : IDisposable
     {
+        private bool isDisposed = false;
 
         public Context Context { get; }
         public void* Pointer { get; }
@@ -19,9 +20,9 @@ namespace OpenCLforNet.Runtime
         {
             Context = context;
 
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status = cl_status_code.CL_SUCCESS;
             var sourceArray = Encoding.UTF8.GetBytes(source);
-            var lengths = (void *)(new IntPtr(source.Length));
+            var lengths = (void*)(new IntPtr(source.Length));
             fixed (byte* sourceArrayPointer = sourceArray)
             {
                 byte*[] sourcesArray = new byte*[] { sourceArrayPointer };
@@ -39,7 +40,7 @@ namespace OpenCLforNet.Runtime
                 for (var i = 0; i < devices.Length; i++)
                     devicePointers[i] = devices[i].Pointer;
                 OpenCL.clBuildProgram(Pointer, (uint)devices.Length, devicePointers, null, null, null).CheckError();
-                
+
             }
             catch (Exception e)
             {
@@ -55,15 +56,37 @@ namespace OpenCLforNet.Runtime
             }
         }
 
+        ~CLProgram() => Dispose(false);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool includeManaged)
+        {
+            if (!isDisposed)
+            {
+                if (includeManaged)
+                    DisposeManaged();
+
+                DisposeUnManaged();
+                isDisposed = true;
+            }
+        }
         public Kernel CreateKernel(string kernelName)
         {
             return new Kernel(this, kernelName);
         }
 
-        public void Release()
+        protected void DisposeUnManaged()
         {
             OpenCL.clReleaseProgram(Pointer).CheckError();
         }
 
+        protected virtual void DisposeManaged() { }
+
+        public virtual void Release() => Dispose();
     }
 }

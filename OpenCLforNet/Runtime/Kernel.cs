@@ -9,8 +9,9 @@ using OpenCLforNet.Function;
 
 namespace OpenCLforNet.Runtime
 {
-    public unsafe class Kernel
+    public unsafe class Kernel : IDisposable
     {
+        private bool isDisposed = false;
 
         public string KernelName { get; }
         public CLProgram Program { get; }
@@ -21,7 +22,7 @@ namespace OpenCLforNet.Runtime
             KernelName = kernelName;
             Program = program;
 
-            int status = (int)cl_status_code.CL_SUCCESS;
+            var status = cl_status_code.CL_SUCCESS;
             var kernelNameArray = Encoding.UTF8.GetBytes(kernelName);
             fixed (byte* kernelNameArrayPointer = kernelNameArray)
             {
@@ -30,6 +31,25 @@ namespace OpenCLforNet.Runtime
             }
         }
 
+        ~Kernel() => Dispose(false);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool includeManaged)
+        {
+            if (!isDisposed)
+            {
+                if (includeManaged)
+                    DisposeManaged();
+
+                DisposeUnManaged();
+                isDisposed = true;
+            }
+        }
         private void*[] Args = new void*[0];
 
         public void SetArgs(params object[] args)
@@ -114,7 +134,7 @@ namespace OpenCLforNet.Runtime
             {
                 OpenCL.clEnqueueNDRangeKernel(commandQueue.Pointer, Pointer, Dimention, null, WorkSizes, null, num, listPointer, &event_).CheckError();
             }
-            
+
             return new Event(event_);
         }
 
@@ -131,7 +151,7 @@ namespace OpenCLforNet.Runtime
             return NDRange(commandQueue);
         }
 
-        public void Release()
+        protected void DisposeUnManaged()
         {
             foreach (var arg in Args)
             {
@@ -140,5 +160,8 @@ namespace OpenCLforNet.Runtime
             OpenCL.clReleaseKernel(Pointer).CheckError();
         }
 
+        protected virtual void DisposeManaged() { }
+
+        public virtual void Release() => Dispose();
     }
 }

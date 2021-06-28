@@ -16,19 +16,26 @@ namespace OpenCLforNet.PlatformLayer
         public void* Pointer { get; }
         public DeviceInfo Info { get; }
 
+        public Device() : this(new Platform(0), 0) { }
+
         public Device(Platform platform, int index)
         {
+            if (!platform.Info.IsDeviceInfoObtainable)
+                throw new ArgumentException("This platform has invalid device info.");
+            if (platform.Info.DeviceInfos.Count <= index)
+                throw new IndexOutOfRangeException();
+
             Platform = platform;
             Index = index;
 
             // get a device
             uint count = 0;
-            OpenCL.clGetDeviceIDs(platform.Pointer, (long)cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
+            OpenCL.clGetDeviceIDs(platform.Pointer, cl_device_type.CL_DEVICE_TYPE_ALL, 0, null, &count).CheckError();
 
-            var devices = (void **)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
+            var devices = (void**)Marshal.AllocCoTaskMem((int)(count * IntPtr.Size));
             try
             {
-                OpenCL.clGetDeviceIDs(platform.Pointer, (long)cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
+                OpenCL.clGetDeviceIDs(platform.Pointer, cl_device_type.CL_DEVICE_TYPE_ALL, count, devices, &count).CheckError();
                 Pointer = devices[index];
             }
             finally
@@ -36,7 +43,7 @@ namespace OpenCLforNet.PlatformLayer
                 Marshal.FreeCoTaskMem(new IntPtr(devices));
             }
 
-            Info = Platform.PlatformInfos[platform.Index].DeviceInfos[index];
+            Info = platform.Info.DeviceInfos[index];
         }
 
         public Context CreateContext()

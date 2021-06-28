@@ -34,10 +34,11 @@ namespace OpenCLforNet.Runtime
             Pointer = pointer;
         }
 
-        public void Wait()
+        public Event Wait()
         {
             var event_ = Pointer;
             OpenCL.clWaitForEvents(1, &event_);
+            return this;
         }
 
     }

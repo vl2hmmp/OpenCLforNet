@@ -61,17 +61,17 @@ namespace OpenCLforNet.Memory
 
         public MappingMemory(Context context, IntPtr data, long size)
         {
-            CreateMappingMemory(context, (void *)data, size);
+            CreateMappingMemory(context, (void*)data, size);
         }
 
-        public MappingMemory(Context context, void *data, long size)
+        public MappingMemory(Context context, void* data, long size)
         {
             CreateMappingMemory(context, data, size);
         }
 
         private void CreateMappingMemory(Context context, long size)
         {
-            int status;
+            cl_status_code status;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, (cl_mem_flags.CL_MEM_ALLOC_HOST_PTR | cl_mem_flags.CL_MEM_READ_WRITE), new IntPtr(size), null, &status);
             Size = size;
             Context = context;
@@ -80,7 +80,7 @@ namespace OpenCLforNet.Memory
 
         private void CreateMappingMemory(Context context, void* dataPointer, long size)
         {
-            int status;
+            cl_status_code status;
             Pointer = OpenCL.clCreateBuffer(context.Pointer, (cl_mem_flags.CL_MEM_USE_HOST_PTR | cl_mem_flags.CL_MEM_READ_WRITE), new IntPtr(size), dataPointer, &status);
             Size = size;
             Context = context;
@@ -89,7 +89,7 @@ namespace OpenCLforNet.Memory
 
         public Event Mapping(CommandQueue commandQueue, bool blocking, long offset, long size, out void* pointer)
         {
-            int status;
+            cl_status_code status;
             void* event_ = null;
             pointer = OpenCL.clEnqueueMapBuffer(commandQueue.Pointer, Pointer, blocking, (cl_map_flags.CL_MAP_READ | cl_map_flags.CL_MAP_WRITE), new IntPtr(offset), new IntPtr(size), 0, null, &event_, &status);
             status.CheckError();
